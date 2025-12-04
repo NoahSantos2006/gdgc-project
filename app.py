@@ -60,6 +60,40 @@ def create_test_user():
     db.session.commit()
     return "Test user created!"
 
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+
+    if request.method == 'GET':
+
+        return render_template('login.html')
+    
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    return f"You submitted: {email}, {password}"
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+
+    if request.method == 'GET':
+        return render_template('signup.html')
+
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        return render_template('signup.html', error="email already in use")
+
+    new_user = User(email=email)
+    new_user.set_password(password)
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return redirect(url_for('login_page'))
+
 
 if __name__ == '__main__':
 
